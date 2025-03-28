@@ -29,7 +29,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Container(),
+      body: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.red
+        ),
+      ),
     );
   }
 }
