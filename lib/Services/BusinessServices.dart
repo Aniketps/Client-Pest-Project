@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BusinessService {
+  late String uid;
   late String description;
   late String duration;
   late String idealFor;
@@ -17,10 +18,11 @@ class BusinessService {
     required this.rate,
     required this.safetyMeasures,
     required this.type,
+    required this.uid
   });
 
   // Factory constructor to create a BusinessService instance from Firebase data
-  factory BusinessService.fromMap(Map<String, dynamic> data) {
+  factory BusinessService.fromMap(Map<String, dynamic> data, String documentId) {
     return BusinessService(
       description: data['description'] ?? '',
       duration: data['duration'] ?? '',
@@ -29,6 +31,7 @@ class BusinessService {
       rate: data['rate'] ?? 0,
       safetyMeasures: data['safetyMeasures'] ?? '',
       type: data['type'] ?? '',
+      uid: documentId,  // Use document ID for UID
     );
   }
 }
@@ -42,7 +45,7 @@ class BusinessServices {
       var snapshot = await FirebaseFirestore.instance.collection("Services").get();
 
       services = snapshot.docs.map((doc) {
-        return BusinessService.fromMap(doc.data());
+        return BusinessService.fromMap(doc.data(), doc.id);  // Pass doc.id as the UID
       }).toList();
 
       print("Fetched ${services.length} services!");

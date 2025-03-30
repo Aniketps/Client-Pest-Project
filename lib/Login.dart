@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rakshakpestcontroller/Components/Buttons.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -6,242 +7,364 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  bool isSignIn = true; // To toggle between Sign In and Sign Up forms
+  double getResposive(BuildContext context, double a, double b, double c, double d) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    bool isSmallMobile = screenWidth < 480;
+    bool isMobile = screenWidth >= 480 && screenWidth < 768;
+    bool isTablet = screenWidth >= 768 && screenWidth < 1024;
 
-  // Function to switch between forms
-  void toggleForm() {
-    setState(() {
-      isSignIn = !isSignIn;
-    });
+    return isSmallMobile
+        ? a
+        : isMobile
+        ? b
+        : isTablet
+        ? c
+        : d;
   }
+
+  bool isSmallPhone() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth < 480;
+  }
+
+  bool isPhone() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth >= 480 && screenWidth < 768;
+  }
+
+  bool isSignIn = false;
+
+  TextEditingController name = new TextEditingController();
+  TextEditingController email = new TextEditingController();
+  TextEditingController password1 = new TextEditingController();
+  TextEditingController password2 = new TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width
-    double screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    // Define breakpoints for responsive design
-    bool isMobile = screenWidth < 768;
-    bool isTablet = screenWidth >= 768 && screenWidth < 1024;
-    bool isDesktop = screenWidth >= 1024;
+    BoxShadow customerShadow() {
+      return BoxShadow(
+        color: Colors.blue.withOpacity(0.3),
+        spreadRadius: 1.0,
+        blurRadius: 2.0,
+        offset: Offset(4, 4),
+      );
+    }
 
-    // Adjust text size based on screen width
-    double textSize = isDesktop ? 20 : (isTablet ? 18 : 16);
-    double buttonFontSize = isDesktop ? 20 : (isTablet ? 18 : 16);
-
-    // Set container size to 50% of screen width
-    double containerWidth = screenWidth * 0.5;
-
-    return Scaffold(
-      body: Center(
+    Container signIn(){
+      return Container(
+        width: getResposive(context, 350, 380, 400, 450),
+        height: getResposive(context, 400, 420, 450, 470),
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.2, color: Colors.blue),
+            borderRadius: BorderRadius.circular(getResposive(context, 20, 18, 20, 20)),
+            boxShadow: [customerShadow()],
+            color: Colors.white
+        ),
         child: Padding(
-          padding: EdgeInsets.all(isDesktop ? 40.0 : 20.0), // Responsive padding
-          child: SingleChildScrollView(
-            child: Container(
-              width: containerWidth, // 50% of the screen width
-              padding: EdgeInsets.all(isDesktop ? 40.0 : 20.0), // Add padding to the container
-              decoration: BoxDecoration(
-                color: Colors.white, // Set the background color for the container
-                borderRadius: BorderRadius.circular(12), // Rounded corners
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3), // Shadow position
+          padding: EdgeInsets.all(getResposive(context, 30, 40, 40, 50)),
+          child: Column(
+            children: [
+              Text("Sing In", style: TextStyle(fontSize: getResposive(context, 18, 20, 22, 24), fontWeight: FontWeight.bold),),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              TextField(
+                controller: email,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
-                ],
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue, width: 2),
+                  ),
+                ),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                cursorColor: Colors.blueAccent,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              TextField(
+                controller: password1,
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue, width: 2),
+                  ),
+                ),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                cursorColor: Colors.blueAccent,
+              ),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      InkWell(
+                          onTap: (){
+                            setState(() {
+                              isSignIn = !isSignIn;
+                            });
+                          },
+                          child: Text("Don't have an account?", style: TextStyle(fontSize: getResposive(context, 8, 10, 10, 12), color: Colors.blue),))
+                    ],
+                  )),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CustomeButtons.getButton(getResposive(context, 40, 38, 40, 50), getResposive(context, 130, 120, 130, 150), Colors.blue, Icons.cloud_upload, 8, Colors.white, "Sign In", Colors.white, getResposive(context, 12, 14, 16, 18))
+                    ],
+                  )),
+              SizedBox(height: getResposive(context, 8, 9, 9, 8),),
+              Row(
                 children: [
-                  // Title (Inside the container)
-                  Text(
-                    isSignIn ? "Sign In" : "Sign Up",
-                    style: TextStyle(
-                      fontSize: 24, // Adjust font size for the title
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey,      // Divider color
+                      thickness: 1,            // Divider thickness
                     ),
                   ),
-                  SizedBox(height: isDesktop ? 30 : 15), // Spacing below the title
-
-                  // Username (Name) TextField
-                  SizedBox(
-                    width: containerWidth, // Set width to 50% of the screen width (same as container)
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: "Name",
-                        labelStyle: TextStyle(fontSize: textSize), // Adjust label size
-                        contentPadding: EdgeInsets.symmetric(vertical: isDesktop ? 20 : 10),
-                        border: OutlineInputBorder(),
-                      ),
+                  SizedBox(width: 8),
+                  Text("OR"),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey,
+                      thickness: 1,
                     ),
                   ),
-                  SizedBox(height: isDesktop ? 20 : 10), // Responsive spacing
-
-                  // Email TextField
-                  SizedBox(
-                    width: containerWidth, // Set width to 50% of the screen width (same as container)
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        labelStyle: TextStyle(fontSize: textSize), // Adjust label size
-                        contentPadding: EdgeInsets.symmetric(vertical: isDesktop ? 15 : 10),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: isDesktop ? 20 : 10), // Responsive spacing
-
-                  // Password TextField
-                  SizedBox(
-                    width: containerWidth, // Set width to 50% of the screen width (same as container)
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        labelStyle: TextStyle(fontSize: textSize), // Adjust label size
-                        contentPadding: EdgeInsets.symmetric(vertical: isDesktop ? 15 : 10),
-                        border: OutlineInputBorder(),
-                      ),
-                      obscureText: true,
-                    ),
-                  ),
-                  SizedBox(height: isDesktop ? 20 : 10), // Responsive spacing
-
-                  // Conditional Confirm Password field (only for Sign Up)
-                  if (!isSignIn)
-                    SizedBox(
-                      width: containerWidth, // Set width to 50% of the screen width (same as container)
-                      child: TextField(
-                        decoration: InputDecoration(
-                          labelText: "Confirm Password",
-                          labelStyle: TextStyle(fontSize: textSize), // Adjust label size
-                          contentPadding: EdgeInsets.symmetric(vertical: isDesktop ? 15 : 10),
-                          border: OutlineInputBorder(),
-                        ),
-                        obscureText: true,
-                      ),
-                    ),
-
-                  SizedBox(height: isDesktop ? 20 : 15), // Responsive spacing between button and text
-
-                  // Row for Sign In/Sign Up Button and text for toggle form
-                  Column(
-                    children: [
-                      // First Row: Text Button (left side)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          TextButton(
-                            onPressed: toggleForm,
-                            child: Text(
-                              isSignIn
-                                  ? "Don't have an account?"
-                                  : "Already have an account?",
-                              style: TextStyle(
-                                fontSize: buttonFontSize - 6, // Make the font size very small
-                                color: Colors.blue, // Optional: Change text color
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Add vertical space after the text button
-                      SizedBox(height: 10), // Adjust vertical space if needed
-
-                      // Second Row: Sign In/Sign Up Button with Icon (right side)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end, // Align button to the right
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: Icon(Icons.cloud, size: buttonFontSize), // Cloud icon inside the button
-                            label: Text(
-                              isSignIn ? "Sign In" : "Sign Up",
-                              style: TextStyle(fontSize: buttonFontSize), // Adjust text size
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue, // Set background color
-                              foregroundColor: Colors.white, // Set text color to white
-                              padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : 20, vertical: 15),
-                              textStyle: TextStyle(fontSize: buttonFontSize), // Adjust text size
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero, // No rounded corners, rectangular shape
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Add vertical space after the button
-                      SizedBox(height: 20), // Adjust vertical space if needed
-                    ],
-                  ),
-
-                  // Divider and 'or' text
-                  SizedBox(height: isDesktop ? 30 : 15), // Responsive spacing
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          color: Colors.black, // Divider color
-                          thickness: 1, // Divider thickness
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10), // Padding around 'or' text
-                        child: Text(
-                          'OR',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: buttonFontSize),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: Colors.black, // Divider color
-                          thickness: 1, // Divider thickness
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Google sign-in button
-                  SizedBox(height: isDesktop ? 20 : 10),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.withOpacity(0.4)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Replacing the Icon with the Google logo
-                        Image.asset(
-                          'assets/icons/google.jpg', // Path to your image
-                          height: isDesktop ? 24 : 20,  // Adjust size based on screen size
-                          width: isDesktop ? 24 : 20,   // Adjust size based on screen size
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Google',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: buttonFontSize,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                 ],
               ),
-            ),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+              InkWell(
+                onTap: (){},
+                child: CustomeButtons.getButton1(context, getResposive(context, 40, 45, 50, 50), getResposive(context, 200, 250, 300, 300), Color(
+                    0xffdee9fa), "assets/icons/google.png", 8, Colors.black, "Google", Colors.black, 16),
+              )
+            ],
           ),
         ),
-      ),
+      );
+    }
+
+    Container signUp(){
+      return Container(
+        width: getResposive(context, 350, 380, 400, 450),
+        height: getResposive(context, 510, 550, 600, 600),
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.2, color: Colors.blue),
+          borderRadius: BorderRadius.circular(getResposive(context, 20, 18, 20, 20)),
+          boxShadow: [customerShadow()],
+          color: Colors.white
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(getResposive(context, 30, 40, 40, 50)),
+          child: Column(
+            children: [
+              Text("Sing Up", style: TextStyle(fontSize: getResposive(context, 18, 20, 22, 24), fontWeight: FontWeight.bold),),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+              TextField(
+                controller: name,
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue, width: 2),
+                  ),
+                ),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                cursorColor: Colors.blueAccent,
+              ),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              TextField(
+                controller: email,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue, width: 2),
+                  ),
+                ),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                cursorColor: Colors.blueAccent,
+              ),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              TextField(
+                controller: password1,
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue, width: 2),
+                  ),
+                ),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                cursorColor: Colors.blueAccent,
+              ),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              TextField(
+                controller: password2,
+                decoration: InputDecoration(
+                  labelText: "Confirm Password",
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue, width: 2),
+                  ),
+                ),
+                style: TextStyle(fontSize: 16, color: Colors.black),
+                cursorColor: Colors.blueAccent,
+              ),
+              SizedBox(height: getResposive(context, 3, 3, 4, 5),),
+              Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      InkWell(
+                          onTap: (){
+                            setState(() {
+                              isSignIn = !isSignIn;
+                            });
+                          },
+                          child: Text("Already have an account?", style: TextStyle(fontSize: getResposive(context, 8, 10, 10, 12), color: Colors.blue),))
+                    ],
+                  )),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+              Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CustomeButtons.getButton(getResposive(context, 40, 38, 40, 50), getResposive(context, 130, 120, 130, 150), Colors.blue, Icons.cloud_upload, 8, Colors.white, "Sign Up", Colors.white, getResposive(context, 12, 14, 16, 18))
+                    ],
+                  )),
+              SizedBox(height: getResposive(context, 8, 9, 9, 10),),
+              Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey,      // Divider color
+                      thickness: 1,            // Divider thickness
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text("OR"),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+              InkWell(
+                onTap: (){},
+                child: CustomeButtons.getButton1(context, getResposive(context, 40, 45, 50, 50), getResposive(context, 200, 250, 300, 300), Color(
+                    0xffdee9fa), "assets/icons/google.png", 8, Colors.black, "Google", Colors.black, 16),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          Center(
+            child: !isSignIn? signIn() : signUp(),
+          )
+        ],
+      )
     );
   }
 }

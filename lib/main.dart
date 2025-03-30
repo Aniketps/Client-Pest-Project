@@ -12,7 +12,6 @@ import 'package:rakshakpestcontroller/Login.dart';
 import 'package:rakshakpestcontroller/Services/AboutBusiness.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Components/InputField.dart';
-import 'Register.dart';
 import 'Services/BusinessServices.dart';
 import 'Services/RatingAndReviews.dart';
 import 'firebase_options.dart';
@@ -113,6 +112,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getAboutBusiness() {}
   bool isShowNumber = false;
+  bool isEnquiry = false;
+  TextEditingController name = new TextEditingController();
+  TextEditingController mobileNumber = new TextEditingController();
+  TextEditingController email = new TextEditingController();
+  TextEditingController localAddress = new TextEditingController();
+
+  String selectedServiceUID = '';
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +161,195 @@ class _MyHomePageState extends State<MyHomePage> {
               )
             ],
           ),
+        ),
+      );
+    }
+
+    Container enquiry(){
+      return Container(
+        width: getResposive(context, 350, 450, 600, 900),
+        height: getResposive(context, 510, 450, 500, 600),
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.2, color: Colors.blue),
+            borderRadius: BorderRadius.circular(getResposive(context, 20, 18, 20, 20)),
+            boxShadow: [customerShadow()],
+            color: Colors.white
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(getResposive(context, 2, 4, 5, 10)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      setState(() {
+                        isEnquiry = false;
+                      });
+                    },
+                    child: Container(
+                        height: 40,
+                        width: 40,
+                        child: Icon(Icons.close)),
+                  )
+                ],
+              ),
+              Text("Enquiry Form", style: TextStyle(fontSize: getResposive(context, 18, 20, 22, 24), fontWeight: FontWeight.bold),),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                  width: getResposive(context, 350, 450, 600, 900) * 0.47,
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black)
+                    ),
+                    child: Column(
+                        children: [
+
+                          ],
+                    ),
+                  ),
+                  Container(
+                    height: getResposive(context, 510, 450, 500, 600) - getResposive(context, 60, 80, 100, 150),
+                    width: 1,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                    width: getResposive(context, 350, 450, 600, 900) * 0.47,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Contact Information", style: TextStyle(fontSize: getResposive(context, 16, 18, 20, 22), fontWeight: FontWeight.bold),),
+                        SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+                        TextField(
+                          controller: name,
+                          decoration: InputDecoration(
+                            labelText: "Name",
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blue, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          cursorColor: Colors.blueAccent,
+                        ),
+                        SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+                        TextField(
+                          controller: mobileNumber,
+                          decoration: InputDecoration(
+                            labelText: "Mobile Number",
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blue, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          cursorColor: Colors.blueAccent,
+                        ),
+                        SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+                        TextField(
+                          controller: email,
+                          decoration: InputDecoration(
+                            labelText: "Email (Optional)",
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blue, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          cursorColor: Colors.blueAccent,
+                        ),
+                        SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+                        TextField(
+                          controller: localAddress,
+                          decoration: InputDecoration(
+                            labelText: "Local Address",
+                            hintStyle: TextStyle(color: Colors.grey[500]),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.blue, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          cursorColor: Colors.blueAccent,
+                        ),
+                        SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+                        SizedBox(height: getResposive(context, 14, 16, 16, 18),),
+
+                        Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                CustomeButtons.getButton(getResposive(context, 40, 38, 40, 50), getResposive(context, 130, 120, 130, 150), Colors.blue, Icons.send, 8, Colors.white, "Send", Colors.white, getResposive(context, 12, 14, 16, 18))
+                              ],
+                            )),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          )
         ),
       );
     }
@@ -236,13 +431,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AdminLogin(),
-                          ));
-                    },
-                    onDoubleTap: (){
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Register(),
                           ));
                     },
                     child: Container(
@@ -468,7 +656,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                     "Call Now"),
                               ),
                               InkWell(
-                                onTap: (){},
+                                onTap: (){
+                                  setState(() {
+                                    isEnquiry = true;
+                                  });
+                                },
                                 child: getContactIconWithName(
                                     Image(
                                       image: AssetImage(
@@ -520,7 +712,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 width: getResposive(context, 5, 10, 15, 20),
                               ),
                               InkWell(
-                                onTap: (){},
+                                onTap: (){
+                                  setState(() {
+                                    isEnquiry = true;
+                                  });
+                                },
                                   child: CustomeButtons.getButton(
                                       getResposive(context, 20, 30, 40, 50),
                                       getResposive(context, 100, 120, 150, 180),
@@ -979,16 +1175,19 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 height: 8,
               ),
-              CustomeButtons.getButton(
-                  getResposive(context, 38, 35, 40, 55),
-                  getResposive(context, 180, 180, 200, 300),
-                  Color(0xFF31AD01),
-                  Icons.send,
-                  8,
-                  Colors.white,
-                  "Enquire Now",
-                  Colors.white,
-                  14)
+              InkWell(
+                onTap: (){},
+                child: CustomeButtons.getButton(
+                    getResposive(context, 38, 35, 40, 55),
+                    getResposive(context, 180, 180, 200, 300),
+                    Color(0xFF31AD01),
+                    Icons.send,
+                    8,
+                    Colors.white,
+                    "Enquire Now",
+                    Colors.white,
+                    14),
+              )
             ],
           ),
         ),
@@ -1425,6 +1624,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             isShowNumber? Center(child: showNumber()) : Container(),
+            isEnquiry? Center(child: enquiry(),) : Container(),
           ],
         )
     );
