@@ -6,11 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rakshakpestcontroller/AdminLogin.dart';
 import 'package:rakshakpestcontroller/Components/Buttons.dart';
 import 'package:rakshakpestcontroller/Login.dart';
 import 'package:rakshakpestcontroller/Services/AboutBusiness.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'Components/InputField.dart';
+import 'Register.dart';
 import 'Services/BusinessServices.dart';
 import 'Services/RatingAndReviews.dart';
 import 'firebase_options.dart';
@@ -110,6 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void getAboutBusiness() {}
+  bool isShowNumber = false;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +125,37 @@ class _MyHomePageState extends State<MyHomePage> {
         spreadRadius: 1.0,
         blurRadius: 2.0,
         offset: Offset(4, 4),
+      );
+    }
+
+    Container showNumber(){
+      return Container(
+        height: getResposive(context, 150, 150, 220, 200),
+        width: getResposive(context, 300, 280, 300, 400),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [customerShadow()],
+          border: Border.all(width: 0.2, color: Colors.blue),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Number : "+business.contactNumber.toString(), style: TextStyle(fontSize: getResposive(context, 20, 18, 24, 24), fontWeight: FontWeight.bold),),
+              SizedBox(height: getResposive(context, 10, 5, 8, 10),),
+              InkWell(
+                onTap: (){
+                  setState(() {
+                    isShowNumber = !isShowNumber;
+                  });
+                },
+                child: CustomeButtons.getButton(getResposive(context, 44, 30, 48, 50), getResposive(context, 160, 120, 150, 200), Colors.green, Icons.close, 8, Colors.white, "Close", Colors.white, getResposive(context, 16, 14, 18, 20))
+              )
+            ],
+          ),
+        ),
       );
     }
 
@@ -195,6 +229,20 @@ class _MyHomePageState extends State<MyHomePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => Login(),
+                          ));
+                    },
+                    onLongPress: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdminLogin(),
+                          ));
+                    },
+                    onDoubleTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Register(),
                           ));
                     },
                     child: Container(
@@ -453,7 +501,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             children: [
                               InkWell(
                                 onTap: () {
-
+                                  setState(() {
+                                    isShowNumber = !isShowNumber;
+                                  });
                                 },
                                 child: CustomeButtons.getButton(
                                     getResposive(context, 20, 30, 40, 50),
@@ -717,7 +767,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 5,
               ),
               InkWell(
-                onTap: (){},
+                onTap: () {
+                  setState(() {
+                    isShowNumber = !isShowNumber;
+                  });
+                },
                 child: CustomeButtons.getButton(
                     getResposive(context, 0, 34, 38, 40),
                     getResposive(context, 0, 150, 170, 180),
@@ -806,16 +860,23 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    Container photo() {
+    Container photo(String path) {
       return Container(
         height: getResposive(context, 130, 140, 280, 280),
         width: getResposive(context, 180, 180, 400, 400),
         decoration: BoxDecoration(
-            borderRadius:
-                BorderRadius.circular(getResposive(context, 2, 3, 4, 5)),
-            color: Colors.white,
-            boxShadow: [customerShadow()],
-            border: Border.all(width: 0.2, color: Colors.blue)),
+          borderRadius: BorderRadius.circular(getResposive(context, 2, 3, 4, 5)),
+          color: Colors.white,
+          boxShadow: [customerShadow()],
+          border: Border.all(width: 0.2, color: Colors.blue),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(getResposive(context, 2, 3, 4, 5)),
+          child: Image.asset(
+            path,    // Add the proper image extension (e.g., .png, .jpg)
+            fit: BoxFit.cover,             // Ensures the image covers the entire area
+          ),
+        ),
       );
     }
 
@@ -840,19 +901,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: const EdgeInsets.all(1),
                 child: Row(
                   children: [
-                    photo(),
+                    photo("assets/images/image1.png"),
                     SizedBox(
                       width: getResposive(context, 5, 8, 10, 15),
                     ),
-                    photo(),
+                    photo("assets/images/image2.png"),
                     SizedBox(
                       width: getResposive(context, 5, 8, 10, 15),
                     ),
-                    photo(),
-                    SizedBox(
-                      width: getResposive(context, 5, 8, 10, 15),
-                    ),
-                    photo(),
+                    photo("assets/images/image3.png"),
                   ],
                 ),
               ),
@@ -862,8 +919,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    Container serviceInfo(
-        String title, String description, String rate, String type) {
+    Container serviceInfo(String title, String description, String rate, String type) {
       return Container(
         width: getResposive(context, 340, 280, 380, 450),
         decoration: BoxDecoration(
@@ -969,7 +1025,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 runAlignment: WrapAlignment.center,
                 children: businessServices.allServices.map<Widget>((service) {
                   return serviceInfo(service.name, service.description,
-                      service.rate.toString(), service.type);
+                      "₹"+service.rate.toString(), service.type);
                 }).toList(),
               ),
             )
@@ -1303,68 +1359,74 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
         appBar: customAppBar(context),
-        body: Container(
-          height: screenHeight,
-          width: screenWidth,
-          decoration: BoxDecoration(color: Color(0xD9D9D9ff)),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Container(
-              color: Colors.white,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: introSection(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: quickLinks(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          mainContents(),
-                          isSmallPhone()
-                              ? Container()
-                              : Container(
-                                  width: getResposive(
-                                      context,
-                                      0,
-                                      screenWidth * 0.35,
-                                      screenWidth * 0.332,
-                                      screenWidth * 0.29),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      contactInfo(),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Divider(),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      reviewsAndRatings(),
-                                    ],
-                                  ),
+        body: Stack(
+          children: [
+            Container(
+              height: screenHeight,
+              width: screenWidth,
+              decoration: BoxDecoration(color: Color(0xD9D9D9ff)),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Container(
+                  color: Colors.white,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: introSection(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: quickLinks(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              mainContents(),
+                              isSmallPhone()
+                                  ? Container()
+                                  : Container(
+                                width: getResposive(
+                                    context,
+                                    0,
+                                    screenWidth * 0.35,
+                                    screenWidth * 0.332,
+                                    screenWidth * 0.29),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    contactInfo(),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Divider(),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    reviewsAndRatings(),
+                                  ],
                                 ),
-                        ],
-                      ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        isSmallPhone() ? reviewsAndRatings() : Container(),
+                        footerSection()
+                      ],
                     ),
-                    isSmallPhone() ? reviewsAndRatings() : Container(),
-                    footerSection()
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ));
+            isShowNumber? Center(child: showNumber()) : Container(),
+          ],
+        )
+    );
   }
 }
