@@ -15,8 +15,10 @@ import 'package:rakshakpestcontroller/Login.dart';
 import 'package:rakshakpestcontroller/Services/AboutBusiness.dart';
 import 'package:rakshakpestcontroller/main.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'AdminControl.dart';
 import 'Components/InputField.dart';
 import 'Services/BusinessServices.dart';
+import 'Services/Enquiries.dart';
 import 'Services/RatingAndReviews.dart';
 import 'firebase_options.dart';
 import 'main.dart';
@@ -24,6 +26,7 @@ import 'main.dart';
 AboutBusiness business = AboutBusiness();
 BusinessServices businessServices = BusinessServices();
 RatingAndReviews ratingAndReviews = RatingAndReviews();
+Enquiries enquiry = Enquiries();
 
 List<List<dynamic>> services = [];
 
@@ -41,6 +44,7 @@ Future<void> main() async {
   await business.fetchDataFromFirebase();
   await businessServices.fetchServices();
   await ratingAndReviews.fetchReviews();
+  await enquiry.fetchEnquiries();
 
   for (var service in businessServices.allServices) {
     services.add([
@@ -64,7 +68,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MyHomePage(),
+      home: MyHomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

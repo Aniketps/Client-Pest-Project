@@ -12,6 +12,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
   double getResposive(BuildContext context, double a, double b, double c, double d) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -107,6 +108,7 @@ class _LoginState extends State<Login> {
 
               TextField(
                 controller: password1,
+                obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Password",
                   hintStyle: TextStyle(color: Colors.grey[500]),
@@ -345,6 +347,7 @@ class _LoginState extends State<Login> {
 
                 TextField(
                   controller: password1,
+                  obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintStyle: TextStyle(color: Colors.grey[500]),
@@ -372,6 +375,7 @@ class _LoginState extends State<Login> {
 
                 TextField(
                   controller: password2,
+                  obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Confirm Password",
                     hintStyle: TextStyle(color: Colors.grey[500]),

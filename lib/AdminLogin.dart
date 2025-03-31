@@ -11,6 +11,7 @@ class AdminLogin extends StatefulWidget {
 }
 
 class _AdminLogin extends State<AdminLogin> {
+
   double getResposive(BuildContext context, double a, double b, double c, double d) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -105,6 +106,7 @@ class _AdminLogin extends State<AdminLogin> {
 
               TextField(
                 controller: password1,
+                obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Password",
                   hintStyle: TextStyle(color: Colors.grey[500]),
