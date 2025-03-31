@@ -6,7 +6,7 @@ class BusinessService {
   late String duration;
   late String idealFor;
   late String name;
-  late int rate;
+  late String rate;
   late String safetyMeasures;
   late String type;
 
@@ -28,7 +28,7 @@ class BusinessService {
       duration: data['duration'] ?? '',
       idealFor: data['idealFor'] ?? '',
       name: data['name'] ?? '',
-      rate: data['rate'] ?? 0,
+      rate: data['rate'] ?? '',
       safetyMeasures: data['safetyMeasures'] ?? '',
       type: data['type'] ?? '',
       uid: documentId,  // Use document ID for UID
