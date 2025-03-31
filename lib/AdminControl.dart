@@ -482,7 +482,8 @@ class _AdminControll extends State<AdminControll>{
                       Container(
                         height: getResposive(context, 70, 70, 80, 120),
                         color: Color(0xff83a7fa),
-                        child: Expanded(
+                        child: Container(
+                            height: getResposive(context, 60, 70, 80, 80),
                             child: Padding(
                               padding: EdgeInsets.only(left: getResposive(context, 40, 70, 80, 120)),
                               child: Row(

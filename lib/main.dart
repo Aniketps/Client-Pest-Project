@@ -836,7 +836,7 @@ class _MyHomePageState extends State<MyHomePage> {
     double horizontalPadding = getResposive(context, 0, 10, 25, 30);
 
     Container introSection() {
-      double introSectionSizeHeight = getResposive(context, 300, 320, 220, 250);
+      double introSectionSizeHeight = getResposive(context, 220, 320, 220, 250);
       double introSectionSizeWidth = getResposive(context, screenWidth * 0.90,
           screenWidth * 0.9, screenWidth * 0.93, screenWidth * 0.95);
       double businessTitle = getResposive(context, 18, 25, 30, 35);
@@ -1039,6 +1039,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               InkWell(
                                 onTap: (){
                                   setState(() {
+                                    isEnquiry = true;
                                   });
                                 },
                                 child: getContactIconWithName(
@@ -1055,7 +1056,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               InkWell(
                                 onTap: () async {
-                                  final Uri whatsappUri = Uri.parse("https://wa.me/9022270236");
+                                  final Uri whatsappUri = Uri.parse("https://wa.me/8605227613");
 
                                   if (await canLaunchUrl(whatsappUri)) {
                                     await launchUrl(whatsappUri);
@@ -1143,62 +1144,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ],
                           ),
-                    SizedBox(
-                      height: getResposive(context, 8, 7, 9, 13),
-                    ),
-                    isPhone() || isSmallPhone()
-                        ? Container(
-                            width: getResposive(
-                                context,
-                                screenWidth * 0.86,
-                                screenWidth * 0.85,
-                                screenWidth * 0.75,
-                                screenWidth * 0.75),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "Click To Rate",
-                                  style: TextStyle(
-                                      fontSize: getResposive(
-                                          context, 16, 18, 20, 22)),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Icon(
-                                      CupertinoIcons.star,
-                                      size:
-                                          getResposive(context, 34, 36, 30, 40),
-                                    ),
-                                    Icon(
-                                      CupertinoIcons.star,
-                                      size:
-                                          getResposive(context, 34, 36, 30, 40),
-                                    ),
-                                    Icon(
-                                      CupertinoIcons.star,
-                                      size:
-                                          getResposive(context, 34, 36, 30, 40),
-                                    ),
-                                    Icon(
-                                      CupertinoIcons.star,
-                                      size:
-                                          getResposive(context, 34, 36, 30, 40),
-                                    ),
-                                    Icon(
-                                      CupertinoIcons.star,
-                                      size:
-                                          getResposive(context, 34, 36, 30, 40),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          )
-                        : SizedBox(),
                   ],
                 ),
                 !isPhone() && !isSmallPhone()
@@ -2113,7 +2058,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         Container(
                           height: getResposive(context, 70, 70, 80, 120),
                           color: Color(0xff83a7fa),
-                          child: Expanded(
+                          child: Container(
+                            height: getResposive(context, 60, 70, 80, 80),
                               child: Padding(
                                 padding: EdgeInsets.only(left: getResposive(context, 40, 70, 80, 120)),
                                 child: Row(
