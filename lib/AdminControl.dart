@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:rakshakpestcontroller/Services/Enquiries.dart';
 import 'package:rakshakpestcontroller/main.dart';
 
@@ -144,106 +145,118 @@ class _AdminControll extends State<AdminControll>{
       );
     }
 
-    Widget enquirySection(String date, String serviceTitle, String name, String email, String location, String number, String status, String id) {
-      return FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection("Services").doc(serviceTitle).get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Text("Error: ${snapshot.error}");
-          }
-          if (snapshot.hasData && snapshot.data!.exists) {
-            var documentSnapshot = snapshot.data!;
-            var serviceName = documentSnapshot.get("name") ?? 'No Name';
-
-            return Container(
+    Container enquirySection(String date, String serviceTitle, String name, String email, String location, String number, String status, String id) {
+      return Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("All Enquiries", style: TextStyle(fontSize: getResposive(context, 16, 22, 24, 26), fontWeight: FontWeight.bold),),
                   Container(
                     decoration: BoxDecoration(
                         border: Border.all(width: 0.2, color: Colors.blue),
                         boxShadow: [customerShadow()],
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(getResposive(context, 15, 15, 15, 8))
-                    ),
+                        borderRadius:
+                        BorderRadius.circular(getResposive(context, 15, 15, 15, 8))),
                     height: getResposive(context, 200, 180, 200, 240),
                     width: getResposive(context, 320, 250, 300, 400),
-                    padding: EdgeInsets.all(getResposive(context, 10, 8, 10, 15)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Date: $date", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16))),
-                        SizedBox(height: 2,),
-                        Text("For: $serviceName", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16))),
-                        SizedBox(height: 2,),
-                        Text("Name: $name", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16))),
-                        SizedBox(height: 2,),
-                        Text("Email: $email", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16))),
-                        SizedBox(height: 2,),
-                        Text("Location: $location", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16))),
-                        SizedBox(height: 2,),
-                        Text("Phone Number: $number", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16))),
-                        SizedBox(height: 2,),
-                        if (status == "Neutral")
+                    child: Padding(
+                      padding: EdgeInsets.all(getResposive(context, 6, 8, 10, 15)),
+                      child: Column(
+                        children: [
                           Row(
+                            children: [
+                              Text("Date : ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              Text("${date.toString()}", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16)),)
+                            ],
+                          ),
+                          SizedBox(height: 3,),
+                          Row(
+                            children: [
+                              Text("For : ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              Text(
+                                serviceTitle.toString(),
+                                style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16)),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 3,),
+                          Row(
+                            children: [
+                              Text("Name : ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              Text("${name.toString()}", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16)),)
+                            ],
+                          ),
+                          SizedBox(height: 3,),
+                          Row(
+                            children: [
+                              Text("Email : ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              Text("${email.toString()}", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16)),)
+                            ],
+                          ),
+                          SizedBox(height: 3,),
+                          SizedBox(height: 3,),
+                          Row(
+                            children: [
+                              Text("Location : ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              Text("${location}", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16)),)
+                            ],
+                          ),
+                          SizedBox(height: 3,),
+                          Row(
+                            children: [
+                              Text("Phone Number : ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              Text("${number.toString()}", style: TextStyle(fontSize: getResposive(context, 14, 12, 14, 16)),)
+                            ],
+                          ),
+                          SizedBox(height: 3,),
+                          status.toString() == "Neutral"
+                              ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               InkWell(
-                                onTap: () async {
-                                  FirebaseFirestore.instance.collection("Enquiries").doc(id.toString()).update({
-                                    "status": "Accepted",
+                                onTap: (){
+                                  FirebaseFirestore.instance.collection("Enquiries").doc(id).update({
+                                    "status" : "Accepted"
                                   });
                                 },
-                                child: CustomeButtons.getButton(
-                                    getResposive(context, 40, 34, 36, 40),
-                                    getResposive(context, 100, 80, 100, 120),
-                                    Colors.green, Icons.done, 8, Colors.white,
-                                    "Done", Colors.white, getResposive(context, 14, 10, 12, 14)
-                                ),
+                                child: CustomeButtons.getButton(getResposive(context, 40, 34, 36, 40), getResposive(context, 100, 80, 100, 120), Colors.green, Icons.done, 8, Colors.white, "Accepted", Colors.white, getResposive(context, 14, 10, 12, 14)),
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 3,),
                               InkWell(
-                                onTap: () {
-                                  FirebaseFirestore.instance.collection("Enquiries").doc(id.toString()).update({
-                                    "status": "Cancelled",
+                                onTap: (){
+                                  FirebaseFirestore.instance.collection("Enquiries").doc(id).update({
+                                    "status" : "Cancelled"
                                   });
                                 },
-                                child: CustomeButtons.getButton(
-                                  getResposive(context, 40, 34, 36, 40),
-                                  getResposive(context, 100, 90, 100, 120),
-                                  Colors.red,
-                                  Icons.cancel,
-                                  8,
-                                  Colors.white,
-                                  "Canceled",
-                                  Colors.white,
-                                  getResposive(context, 14, 10, 12, 14),
-                                ),
+                                child: CustomeButtons.getButton(getResposive(context, 40, 34, 36, 40), getResposive(context, 100, 90, 100, 120), Colors.red, Icons.close, 8, Colors.white, "Cancelled", Colors.white, getResposive(context, 14, 10, 12, 14)),
                               ),
                             ],
                           )
-                        else
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(status, style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16))),
-                          ),
-                      ],
+                              : Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("${status.toString()}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: getResposive(context, 14, 12, 14, 16)),),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
+                  )
                 ],
               ),
-            );
-          }
-          return Text("No Data Available");
-        },
+            )
+          ],
+        ),
       );
     }
-
 
     Container pastEnquiries() {
       double value = getResposive(
@@ -366,35 +379,6 @@ class _AdminControll extends State<AdminControll>{
       return Container(
         width: getResposive(context, screenWidth * 0.92, screenWidth * 0.92, screenWidth * 0.91, screenWidth * 0.92),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(width: 0.5, color: Colors.blue),
-            color: Colors.white,
-            boxShadow: [customerShadow()]),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: getResposive(context, 0, 8, 8, 10),
-                runSpacing: getResposive(context, 5, 8, 8, 10),
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.center,
-                children: enquiry.allEnquiries.map<Widget>((e) {
-                  return enquirySection(e.date, e.serviceUID, e.name, e.email, e.localAddress, e.mobileNumber, e.status, e.id);
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    Container reviewsAndRatings() {
-      return Container(
-        height: getResposive(context, 500, 500, 500, 650),
-        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           border: Border.all(width: 0.5, color: Colors.blue),
           color: Colors.white,
@@ -403,50 +387,41 @@ class _AdminControll extends State<AdminControll>{
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
               children: [
-                Text(
-                  "Reviews & Ratings",
-                  style: TextStyle(
-                    fontSize: getResposive(context, 16, 22, 24, 26),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8),
-                // Column for reviews
-                Column(
-                  children: ratingAndReviews.allReviews
-                      .take(reviewsToShow)  // Only show top 'reviewsToShow' reviews
-                      .map<Widget>((review) {
-                    return Column(
-                      children: [
-                        commentSection(
-                          review.name,
-                          review.date,
-                          review.rate,
-                          review.comment,
-                        ),
-                        SizedBox(height: 10),
-                      ],
-                    );
-                  }).toList(),
-                ),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection("Enquiries").orderBy("date", descending: false).snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(child: CircularProgressIndicator());
+                    }
 
-                // Button to load more reviews if available
-                if (ratingAndReviews.allReviews.length > reviewsToShow)
-                  Center(
-                    child: InkWell(
-                        onTap: (){
-                          setState(() {
-                            reviewsToShow += 2;  // Load 5 more reviews
-                          });
-                        },
-                        child: CustomeButtons.getButton(getResposive(context, 44, 38, 40, 44), getResposive(context, 120, 100, 120, 140), Colors.blue, Icons.change_circle_rounded, 8, Colors.white, "Load", Colors.white, getResposive(context, 14, 12, 14, 16))
-                    ),
-                  )
+                    final enquiries = snapshot.data?.docs.reversed.toList() ?? [];
+                    List<Widget> enquiriesViews = [];
+
+                    for (var enquiry in enquiries) {
+                      var data = enquirySection(
+                        DateFormat('d MMM y').format((enquiry['date'] as Timestamp).toDate()).toString(),
+                        enquiry['serviceName'].toString(),
+                        enquiry['name'].toString(),
+                        enquiry['email'].toString(),
+                        enquiry['localAddress'].toString(),
+                        enquiry['mobileNumber'].toString(),
+                        enquiry['status'].toString(),
+                        enquiry.id.toString(),
+                      );
+                      enquiriesViews.add(data);
+                    }
+
+                    return Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: enquiriesViews,
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -469,6 +444,19 @@ class _AdminControll extends State<AdminControll>{
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "All Enquiries",
+                              style: TextStyle(
+                                  fontSize: getResposive(context, 16, 22, 24, 26),
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

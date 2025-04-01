@@ -30,6 +30,53 @@ Enquiries enquiry = Enquiries();
 
 List<List<dynamic>> services = [];
 
+int Rating = 0;
+bool isRagingGiven = false;
+double totalRating = 0.0;
+int ratingCount = 0;
+double avg = 0.0;
+String formattedAvg = '0';
+
+Future<void> checkRating() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection("user").doc(user.uid).get();
+    if (documentSnapshot.exists) {
+      Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+
+      if (data != null && data.containsKey('rating')) {
+        Rating = data['rating'] is int ? data['rating'] : (data['rating'] as num).toInt();
+        isRagingGiven = true;
+        print("Rating found: $Rating");
+      } else {
+        print("Rating field not found in the document.");
+      }
+    } else {
+      print("Document does not exist.");
+    }
+  }
+
+  // Reset totalRating and ratingCount to prevent accumulation
+  totalRating = 0.0;
+  ratingCount = 0;
+
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("user").get();
+
+  for (var doc in querySnapshot.docs) {
+    var data = doc.data() as Map<String, dynamic>;
+
+    if (data.containsKey('rating') && data['rating'] is num) {
+      totalRating += (data['rating'] as num).toDouble();
+      ratingCount++;
+    }
+  }
+
+  if (ratingCount > 0) {
+    avg = totalRating / ratingCount;
+    formattedAvg = avg.toStringAsFixed(1);
+  }
+}
+
 List<String> items = [
   "Aniket",
   "Pardeshi"
@@ -41,10 +88,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await checkRating();
   await business.fetchDataFromFirebase();
   await businessServices.fetchServices();
   await ratingAndReviews.fetchReviews();
   await enquiry.fetchEnquiries();
+
 
   for (var service in businessServices.allServices) {
     services.add([
@@ -87,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
     checkCurrentUser();
+    checkRating();
   }
 
   Future<void> checkCurrentUser() async {
@@ -201,6 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey section2Key = GlobalKey();
   final GlobalKey section3Key = GlobalKey();
 
+
   void scrollToSection(GlobalKey key) {
     final context = key.currentContext;
     if (context != null) {
@@ -280,7 +331,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Container enquiry(){
-
       return Container(
         width: getResposive(context, 340, 450, 600, 900),
         height: getResposive(context, 500, 450, 500, 600),
@@ -640,14 +690,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   InkWell(
                                     onTap: (){
-                                      if(serviceuid   != "Empty" && name.text.isNotEmpty && mobileNumber.text.isNotEmpty){
+                                      if(servicename != "Empty" && name.text.isNotEmpty && mobileNumber.text.isNotEmpty){
                                         FirebaseFirestore.instance.collection("Enquiries").add({
                                           "date" : DateTime.now(),
                                           "email" : email.text.isEmpty? "" : email.text,
                                           "localAddress" : localAddress.text.isEmpty? "" : localAddress.text,
                                           "mobileNumber" : mobileNumber.text,
                                           "name" : name.text,
-                                          "serviceUID" : serviceuid,
+                                          "serviceName" : servicename,
                                           "status" : "Neutral"
                                         });
                                         Fluttertoast.showToast(msg: "Send");
@@ -697,7 +747,7 @@ class _MyHomePageState extends State<MyHomePage> {
             bool isTablet = screenWidth >= 768 && screenWidth < 1024;
 
             return Container(
-              height: (isPhone() || isSmallPhone()) ? 60 : 80,
+              height: (isPhone() || isSmallPhone()) ? 70 : 80,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -836,7 +886,7 @@ class _MyHomePageState extends State<MyHomePage> {
     double horizontalPadding = getResposive(context, 0, 10, 25, 30);
 
     Container introSection() {
-      double introSectionSizeHeight = getResposive(context, 220, 320, 220, 250);
+      double introSectionSizeHeight = getResposive(context, 300, 320, 220, 250);
       double introSectionSizeWidth = getResposive(context, screenWidth * 0.90,
           screenWidth * 0.9, screenWidth * 0.93, screenWidth * 0.95);
       double businessTitle = getResposive(context, 18, 25, 30, 35);
@@ -898,7 +948,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  "4.7",
+                                  "${formattedAvg}",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: getResposive(
@@ -917,7 +967,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 5,
                         ),
                         Text(
-                          "343 Ratings",
+                          "${ratingCount.toString()} Ratings",
                           style: TextStyle(
                               fontSize: getResposive(context, 14, 16, 18, 20),
                               color: Colors.green),
@@ -1017,7 +1067,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             children: [
                               InkWell(
                                 onTap: () async {
-                                  final Uri phoneUri = Uri(scheme: 'tel', path: '8605227613');
+                                  final Uri phoneUri = Uri(scheme: 'tel', path: business.contactNumber.toString());
                                   if (await canLaunchUrl(phoneUri)) {
                                     await launchUrl(phoneUri);
                                   } else {
@@ -1056,12 +1106,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               InkWell(
                                 onTap: () async {
-                                  final Uri whatsappUri = Uri.parse("https://wa.me/8605227613");
+                                  final Uri whatsappUri = Uri.parse("https://wa.me/${business.contactNumber.toString()}");
 
                                   if (await canLaunchUrl(whatsappUri)) {
                                     await launchUrl(whatsappUri);
                                   } else {
-                                    print('Could not launch WhatsApp');
+                                    Fluttertoast.showToast(msg: "Could not launch WhatsApp");
                                   }
                                 },
                                 child: getContactIconWithName(
@@ -1144,47 +1194,221 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ],
                           ),
+                    isPhone() || isSmallPhone()
+                        ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        isRagingGiven
+                            ? Container()
+                            : Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Click To Rate",
+                              style: TextStyle(
+                                  fontSize:
+                                  getResposive(context, 16, 18, 20, 22)),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  onTap: (){
+                                    User? user = FirebaseAuth.instance.currentUser;
+                                    if(user != null) {
+                                      FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                        "rating" : 1
+                                      });
+                                    }else{
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                    }
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.star,
+                                    size: getResposive(context, 34, 36, 30, 40),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: (){
+                                    User? user = FirebaseAuth.instance.currentUser;
+                                    if(user != null) {
+                                      FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                        "rating" : 2
+                                      });
+                                    }else{
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                    }
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.star,
+                                    size: getResposive(context, 34, 36, 30, 40),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: (){
+                                    User? user = FirebaseAuth.instance.currentUser;
+                                    if(user != null) {
+                                      FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                        "rating" : 3
+                                      });
+                                    }else{
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                    }
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.star,
+                                    size: getResposive(context, 34, 36, 30, 40),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: (){
+                                    User? user = FirebaseAuth.instance.currentUser;
+                                    if(user != null) {
+                                      FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                        "rating" : 4
+                                      });
+                                    }else{
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                    }
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.star,
+                                    size: getResposive(context, 34, 36, 30, 40),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: (){
+                                    User? user = FirebaseAuth.instance.currentUser;
+                                    if(user != null) {
+                                      FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                        "rating" : 5
+                                      });
+                                    }else{
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                    }
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.star,
+                                    size: getResposive(context, 34, 36, 30, 40),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      ],
+                    )
+                        : SizedBox(),
                   ],
                 ),
                 !isPhone() && !isSmallPhone()
                     ? Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Click To Rate",
-                            style: TextStyle(
-                                fontSize:
-                                    getResposive(context, 16, 18, 20, 22)),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Icon(
+                  children: [
+                    isRagingGiven
+                        ? Container()
+                        : Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Click To Rate",
+                          style: TextStyle(
+                              fontSize:
+                              getResposive(context, 16, 18, 20, 22)),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            InkWell(
+                              onTap: (){
+                                User? user = FirebaseAuth.instance.currentUser;
+                                if(user != null) {
+                                  FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                    "rating" : 1
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                }
+                              },
+                              child: Icon(
                                 CupertinoIcons.star,
                                 size: getResposive(context, 34, 36, 30, 40),
                               ),
-                              Icon(
+                            ),
+                            InkWell(
+                              onTap: (){
+                                User? user = FirebaseAuth.instance.currentUser;
+                                if(user != null) {
+                                  FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                    "rating" : 2
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                }
+                              },
+                              child: Icon(
                                 CupertinoIcons.star,
                                 size: getResposive(context, 34, 36, 30, 40),
                               ),
-                              Icon(
+                            ),
+                            InkWell(
+                              onTap: (){
+                                User? user = FirebaseAuth.instance.currentUser;
+                                if(user != null) {
+                                  FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                    "rating" : 3
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                }
+                              },
+                              child: Icon(
                                 CupertinoIcons.star,
                                 size: getResposive(context, 34, 36, 30, 40),
                               ),
-                              Icon(
+                            ),
+                            InkWell(
+                              onTap: (){
+                                User? user = FirebaseAuth.instance.currentUser;
+                                if(user != null) {
+                                  FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                    "rating" : 4
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                }
+                              },
+                              child: Icon(
                                 CupertinoIcons.star,
                                 size: getResposive(context, 34, 36, 30, 40),
                               ),
-                              Icon(
+                            ),
+                            InkWell(
+                              onTap: (){
+                                User? user = FirebaseAuth.instance.currentUser;
+                                if(user != null) {
+                                  FirebaseFirestore.instance.collection("user").doc(user.uid).update({
+                                    "rating" : 5
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                                }
+                              },
+                              child: Icon(
                                 CupertinoIcons.star,
                                 size: getResposive(context, 34, 36, 30, 40),
                               ),
-                            ],
-                          )
-                        ],
-                      )
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                      ],
+                    )
                     : SizedBox(), // Hide in mobile mode
               ],
             ),
@@ -1208,7 +1432,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Text(
                       "Overview",
                       style: TextStyle(
-                          fontSize: getResposive(context, 14, 16, 18, 20)),
+                          fontSize: getResposive(context, 14, 16, 18, 20), fontWeight: FontWeight.bold),
                     ),
                   )),
                 ),
@@ -1225,7 +1449,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Text(
                       "Photos",
                       style: TextStyle(
-                          fontSize: getResposive(context, 14, 16, 18, 20)),
+                          fontSize: getResposive(context, 14, 16, 18, 20), fontWeight: FontWeight.bold),
                     ),
                   )),
                 ),
@@ -1242,7 +1466,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Text(
                       "Price List",
                       style: TextStyle(
-                          fontSize: getResposive(context, 14, 16, 18, 20)),
+                          fontSize: getResposive(context, 14, 16, 18, 20), fontWeight: FontWeight.bold),
                     ),
                   )),
                 ),
@@ -1259,7 +1483,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Text(
                       "Quick Info",
                       style: TextStyle(
-                          fontSize: getResposive(context, 14, 16, 18, 20)),
+                          fontSize: getResposive(context, 14, 16, 18, 20), fontWeight: FontWeight.bold),
                     ),
                   )),
                 ),
@@ -1302,8 +1526,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
                 child: CustomeButtons.getButton(
-                    getResposive(context, 0, 34, 38, 40),
-                    getResposive(context, 0, 150, 170, 180),
+                    getResposive(context, 40, 34, 38, 40),
+                    getResposive(context, 150, 150, 170, 180),
                     Colors.white,
                     Icons.call,
                     8,
@@ -1322,7 +1546,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Text(
                 business.fullAddress,
                 style:
-                    TextStyle(fontSize: getResposive(context, 0, 14, 16, 18)),
+                    TextStyle(fontSize: getResposive(context, 12, 14, 16, 18)),
               ),
               InkWell(
                 onTap: () async {
@@ -1335,8 +1559,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                 },
                 child: CustomeButtons.getButton(
-                    getResposive(context, 0, 34, 38, 40),
-                    getResposive(context, 0, 120, 170, 180),
+                    getResposive(context, 40, 34, 38, 40),
+                    getResposive(context, 135, 120, 170, 180),
                     Colors.white,
                     Icons.directions,
                     8,
@@ -1346,8 +1570,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     getResposive(context, 12, 12, 16, 18)),
               ),
               CustomeButtons.getButton(
-                  getResposive(context, 0, 34, 38, 40),
-                  getResposive(context, 0, 125, 180, 195),
+                  getResposive(context, 40, 34, 38, 40),
+                  getResposive(context, 150, 125, 180, 195),
                   Colors.white,
                   Icons.watch_later,
                   8,
@@ -1357,24 +1581,35 @@ class _MyHomePageState extends State<MyHomePage> {
                   getResposive(context, 12, 12, 16, 18)),
               InkWell(
                 onTap: () async {
+                  final Uri emailUri = Uri(
+                    scheme: 'mailto',
+                    path: 'aniketp2327@gmail.com',
+                    query: Uri.encodeFull('Subject=Enquiry&Body=Hello, I have an enquiry regarding...'),
+                  );
 
+                  if (await canLaunch(emailUri.toString())) {
+                    await launch(emailUri.toString());
+                  } else {
+                    throw 'Could not launch email client';
+                  }
                 },
                 child: CustomeButtons.getButton(
-                    getResposive(context, 0, 34, 38, 40),
-                    getResposive(context, 0, 130, 245, 270),
+                    getResposive(context, 40, 34, 38, 40),
+                    getResposive(context, 200, 130, 245, 270),
                     Colors.white,
                     Icons.mail,
                     8,
                     Colors.black,
                     "Send Enquiry via Email",
                     Colors.black,
-                    getResposive(context, 12, 8, 16, 18)),
+                    getResposive(context, 12, 8, 16, 18)
+                ),
               ),
               InkWell(
                 onTap: (){},
                 child: CustomeButtons.getButton(
-                    getResposive(context, 0, 34, 38, 40),
-                    getResposive(context, 0, 150, 206, 222),
+                    getResposive(context, 40, 34, 38, 40),
+                    getResposive(context, 170, 150, 206, 222),
                     Colors.white,
                     Icons.contact_mail,
                     8,
@@ -1671,6 +1906,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Text(
               "Quick Information",
+              textAlign: TextAlign.justify,
               style: TextStyle(
                   fontSize: getResposive(context, 16, 22, 24, 26),
                   fontWeight: FontWeight.bold),
@@ -1686,7 +1922,7 @@ class _MyHomePageState extends State<MyHomePage> {
             places("Properties Served"),
             places("Residential, Commercial"),
             SizedBox(height: 5,),
-            Text(business.about),
+            Text(business.about, textAlign: TextAlign.justify,),
           ],
         ),
       );
@@ -1789,34 +2025,15 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 height: 5,
               ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.star,
-                    color: Colors.yellow,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.yellow,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.yellow,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.yellow,
-                  ),
-                  Icon(
-                    Icons.star,
-                    color: Colors.yellow,
-                  ),
-                ],
-              ),
+
               SizedBox(
                 height: 5,
               ),
-              Text(comment),
+              Row(
+                children: [
+                  Text(comment, textAlign: TextAlign.justify,),
+                ],
+              ),
               SizedBox(
                 height: 5,
               ),
@@ -1879,7 +2096,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -1900,19 +2116,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.blueAccent, width: 1),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.blue, width: 2),
                     ),
                   ),
                   style: TextStyle(fontSize: 16, color: Colors.black),
-                  cursorColor: Colors.blueAccent,
                 ),
                 SizedBox(height: 8),
                 Row(
@@ -1920,20 +2126,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     InkWell(
                       onTap: (){
-                        if(!isCurrentUser){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
+                        if(isCurrentUser){
+                        if (comment.text.isNotEmpty) {
+                          FirebaseFirestore.instance.collection("Reviews And Ratings").add({
+                            "comment": comment.text,
+                            "date": DateTime.now(),
+                            "name": currentUserName,
+                            "rate": 4
+                          });
+                          setState(() {});
+                          Fluttertoast.showToast(msg: "Comment Added");
+                        } else {
+                          Fluttertoast.showToast(msg: "Enter Comment");
+                        }
                         }else{
-                          if(comment.text.isNotEmpty){
-                            FirebaseFirestore.instance.collection("Reviews And Ratings").add({
-                              "comment" : comment.text,
-                              "date" : DateTime.now(),
-                              "name" : currentUserName,
-                              "rate" : 4
-                            });
-                            Fluttertoast.showToast(msg: "Comment Added");
-                          }else{
-                            Fluttertoast.showToast(msg: "Enter Comment");
-                          }
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Login(),));
                         }
                       },
                       child: CustomeButtons.getButton(
@@ -1947,42 +2154,73 @@ class _MyHomePageState extends State<MyHomePage> {
                         Colors.white,
                         getResposive(context, 16, 12, 14, 16),
                       ),
-                    )
+                    ),
                   ],
                 ),
                 SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FutureBuilder<QuerySnapshot>(
+                    future: FirebaseFirestore.instance.collection("Reviews And Ratings").orderBy("date", descending: true).get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(child: Text("No reviews available"));
+                      }
 
-                // Column for reviews
-                Column(
-                  children: ratingAndReviews.allReviews
-                      .take(reviewsToShow)  // Only show top 'reviewsToShow' reviews
-                      .map<Widget>((review) {
-                    return Column(
-                      children: [
-                        commentSection(
-                          review.name,
-                          review.date,
-                          review.rate,
-                          review.comment,
-                        ),
-                        SizedBox(height: 10),
-                      ],
-                    );
-                  }).toList(),
+                      final reviews = snapshot.data!.docs;
+                      List<Widget> reviewsViews = [];
+
+                      for (var i = 0; i < reviews.length && i < reviewsToShow; i++) {
+                        var review = reviews[i];
+                        int? rate = int.tryParse(review['rate'].toString());
+                        String date = DateFormat('d MMM y').format((review['date'] as Timestamp).toDate());
+
+                        var data = Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            children: [
+                              commentSection(
+                                review['name'].toString(),
+                                date,
+                                rate!,
+                                review['comment'],
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        );
+
+                        reviewsViews.add(data);
+                      }
+
+                      return Column(children: reviewsViews);
+                    },
+                  ),
                 ),
-
-                // Button to load more reviews if available
-                if (ratingAndReviews.allReviews.length > reviewsToShow)
-                  Center(
-                    child: InkWell(
-                      onTap: (){
-                        setState(() {
-                          reviewsToShow += 2;  // Load 5 more reviews
-                        });
-                      },
-                      child: CustomeButtons.getButton(getResposive(context, 44, 38, 40, 44), getResposive(context, 120, 100, 120, 140), Colors.blue, Icons.change_circle_rounded, 8, Colors.white, "Load", Colors.white, getResposive(context, 14, 12, 14, 16))
+                SizedBox(height: 10),
+                Center(
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        reviewsToShow++; // Load 1 more comment on each tap
+                      });
+                    },
+                    child: CustomeButtons.getButton(
+                      getResposive(context, 44, 38, 40, 44),
+                      getResposive(context, 120, 100, 120, 140),
+                      Colors.blue,
+                      Icons.change_circle_rounded,
+                      8,
+                      Colors.white,
+                      "Load",
+                      Colors.white,
+                      getResposive(context, 14, 12, 14, 16),
                     ),
-                  )
+                  ),
+                ),
               ],
             ),
           ),
@@ -1995,6 +2233,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: customAppBar(context),
         body: Stack(
           children: [
@@ -2053,7 +2292,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             ],
                           ),
                         ),
-                        isSmallPhone() ? reviewsAndRatings() : Container(),
+                        isSmallPhone() ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: reviewsAndRatings(),
+                        ) : Container(),
+                        isSmallPhone() ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: contactInfo(),
+                        ) : Container(),
                         footerSection(),
                         Container(
                           height: getResposive(context, 70, 70, 80, 120),
@@ -2065,7 +2311,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    Text("© 2021–${DateTime.now().year} Rakshak Pest Controller. All rights reserved.", style: TextStyle(fontSize: getResposive(context, 12, 12, 12, 14), fontWeight: FontWeight.bold, color: Colors.white),),
+                                    Text("© 2021–${DateTime.now().year} Rakshak Pest Controller. All rights reserved.", style: TextStyle(fontSize: getResposive(context, 10, 12, 12, 14), fontWeight: FontWeight.bold, color: Colors.white),),
                                   ],
                                 ),
                               )

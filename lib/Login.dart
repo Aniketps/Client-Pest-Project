@@ -144,7 +144,7 @@ class _LoginState extends State<Login> {
                               isSignIn = !isSignIn;
                             });
                           },
-                          child: Text("Don't have an account?", style: TextStyle(fontSize: getResposive(context, 8, 10, 10, 12), color: Colors.blue),))
+                          child: Text("Don't have an account?", style: TextStyle(fontSize: getResposive(context, 12, 10, 10, 12), color: Colors.blue),))
                     ],
                   )),SizedBox(height: 3,),
               Row(
@@ -161,7 +161,7 @@ class _LoginState extends State<Login> {
                           }
                         });
                       },
-                      child: Text("Forgot password?", style: TextStyle(fontSize: getResposive(context, 8, 10, 10, 12), color: Colors.blue),))
+                      child: Text("Forgot password?", style: TextStyle(fontSize: getResposive(context, 12, 10, 10, 12), color: Colors.blue),))
                 ],
               ),
               SizedBox(height: getResposive(context, 14, 16, 16, 18),),

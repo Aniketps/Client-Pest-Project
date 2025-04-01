@@ -7,7 +7,7 @@ class Enquiry {
   final String email;
   final String localAddress;
   final String mobileNumber;
-  final String serviceUID;
+  final String serviceName;
   final String status;
   final String date;
 
@@ -17,7 +17,7 @@ class Enquiry {
     required this.email,
     required this.localAddress,
     required this.mobileNumber,
-    required this.serviceUID,
+    required this.serviceName,
     required this.status,
     required this.date,
   });
@@ -30,7 +30,7 @@ class Enquiry {
       email: data['email'] ?? '',
       localAddress: data['localAddress'] ?? '',
       mobileNumber: data['mobileNumber'] ?? '',
-      serviceUID: data['serviceUID'] ?? '',
+      serviceName: data['serviceName'] ?? '',
       status: data['status'] ?? 'Neutral',
       date: DateFormat('d MMM y').format(
         (data['date'] as Timestamp).toDate(),
