@@ -1583,7 +1583,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () async {
                   final Uri emailUri = Uri(
                     scheme: 'mailto',
-                    path: 'aniketp2327@gmail.com',
+                    path: business.email,
                     query: Uri.encodeFull('Subject=Enquiry&Body=Hello, I have an enquiry regarding...'),
                   );
 
