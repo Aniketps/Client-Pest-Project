@@ -11,6 +11,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:rakshakpestcontroller/AdminLogin.dart';
 import 'package:rakshakpestcontroller/Components/Buttons.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:rakshakpestcontroller/Login.dart';
 import 'package:rakshakpestcontroller/Services/AboutBusiness.dart';
 import 'package:rakshakpestcontroller/main.dart';
@@ -327,6 +329,48 @@ class _MyHomePageState extends State<MyHomePage> {
           serviceuid = selectedService.uid;
           servicerate = selectedService.rate.toString();
         });
+      }
+    }
+
+    Future<void> sendWhatsAppMessage({
+      required String phoneNumberId,
+      required String accessToken,
+      required String recipientNumber,
+      required String templateName,
+      required List<String> templateParams,
+    }) async {
+      final url = Uri.parse('https://graph.facebook.com/v16.0/$phoneNumberId/messages');
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      };
+
+      final body = jsonEncode({
+        "messaging_product": "whatsapp",
+        "to": recipientNumber,
+        "type": "template",
+        "template": {
+          "name": templateName,
+          "language": {"code": "en_US"},
+          "components": [
+            {
+              "type": "body",
+              "parameters": templateParams
+                  .map((param) => {"type": "text", "text": param})
+                  .toList(),
+            }
+          ]
+        }
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('Message sent successfully!');
+      } else {
+        print('Failed to send message: ${response.statusCode}');
+        print('Response body: ${response.body}');
       }
     }
 
@@ -691,6 +735,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   InkWell(
                                     onTap: (){
                                       if(servicename != "Empty" && name.text.isNotEmpty && mobileNumber.text.isNotEmpty){
+
                                         FirebaseFirestore.instance.collection("Enquiries").add({
                                           "date" : DateTime.now(),
                                           "email" : email.text.isEmpty? "" : email.text,
@@ -701,6 +746,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                           "status" : "Neutral"
                                         });
                                         Fluttertoast.showToast(msg: "Send");
+
+
+                                        sendWhatsAppMessage(
+                                          phoneNumberId: "632639496593405",
+                                          accessToken: "EAAJbnSEVIGABO1IAGj0jpZAM4fZARJwIrQZCONghudg3efGZCOR0hGX7m2hu1Wf0eYj7EFY1pn9JOIel7uJJxuBDubWvbLA5N6ZCStZBKa2Ruj0WODYmEOQohdHxkR17eOoZBeyMOzPBTUfLZATKStSg8h4fNJKZBt8HEBRZA9QWMkswKPIp9k6Xa6q1tplv4Pdf911gZDZD",
+                                          recipientNumber: business.contactNumber.toString(),
+                                          templateName: "enquiry1",
+                                          templateParams: [
+                                            "${DateFormat('d MMMM y').format(DateTime.now())}",
+                                            servicename.toString(),
+                                            name.text,
+                                            email.text.isEmpty? "" : email.text,
+                                            mobileNumber.text,
+                                            localAddress.text
+                                          ],
+                                        );
+
                                         setState(() {
                                           isEnquiry = false;
                                         });
