@@ -752,7 +752,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           phoneNumberId: "632639496593405",
                                           accessToken: "EAAJbnSEVIGABO1IAGj0jpZAM4fZARJwIrQZCONghudg3efGZCOR0hGX7m2hu1Wf0eYj7EFY1pn9JOIel7uJJxuBDubWvbLA5N6ZCStZBKa2Ruj0WODYmEOQohdHxkR17eOoZBeyMOzPBTUfLZATKStSg8h4fNJKZBt8HEBRZA9QWMkswKPIp9k6Xa6q1tplv4Pdf911gZDZD",
                                           recipientNumber: business.contactNumber.toString(),
-                                          templateName: "enquiry1",
+                                          templateName: "enquiry",
                                           templateParams: [
                                             "${DateFormat('d MMMM y').format(DateTime.now())}",
                                             servicename.toString(),
